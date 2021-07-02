@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package freckle
+package noko
 
 import (
 	"fmt"
@@ -16,8 +16,8 @@ import (
 const domain = "mydomain"
 const token = "abcdefghijklmnopqrstuvwxyz"
 
-func letsTestFreckle(ts *httptest.Server) Freckle {
-	f := LetsFreckle(domain, token)
+func newTestNoko(ts *httptest.Server) Noko {
+	f := New(domain, token)
 	f.Debug(true)
 	f.base = ts.URL
 	return f
@@ -28,7 +28,7 @@ func authenticated(t *testing.T, method, path string, fn func(w http.ResponseWri
 		assert.Equal(t, method, r.Method, "Should have been HTTP "+method)
 		assert.Equal(t, path, r.URL.Path, "Should have been HTTP URL "+path)
 		assert.Equal(t, domain, r.Header.Get("User-Agent"), "User-Agent header should have been set")
-		assert.Equal(t, token, r.Header.Get("X-FreckleToken"), "X-FreckleToken header should have been set")
+		assert.Equal(t, token, r.Header.Get("X-NokoToken"), "X-NokoToken header should have been set")
 
 		fn(w, r)
 	})

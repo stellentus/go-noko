@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package freckle
+package noko
 
 import (
 	"bytes"
@@ -16,11 +16,11 @@ import (
 
 type onResponse func([]byte, *http.Response) error
 
-func (f Freckle) doHttpRequest(req *http.Request, fn onResponse) error {
+func (f Noko) doHttpRequest(req *http.Request, fn onResponse) error {
 	f.log("Request: HTTP %s %s", req.Method, req.URL)
 
 	req.Header.Add("User-Agent", f.subdomain)
-	req.Header.Add("X-FreckleToken", f.key)
+	req.Header.Add("X-NokoToken", f.key)
 
 	resp, err := f.client.Do(req)
 	if err != nil {
@@ -47,7 +47,7 @@ func (f Freckle) doHttpRequest(req *http.Request, fn onResponse) error {
 }
 
 //
-func (f Freckle) do(method, uri string, ps Parameters, is Inputs, fn onResponse) error {
+func (f Noko) do(method, uri string, ps Parameters, is Inputs, fn onResponse) error {
 	u := f.api(uri, ps)
 
 	var b io.Reader
@@ -68,9 +68,9 @@ func (f Freckle) do(method, uri string, ps Parameters, is Inputs, fn onResponse)
 	return f.doHttpRequest(req, fn)
 }
 
-// Try to parse the data into a FreckleError object
+// Try to parse the data into a NokoError object
 func parseError(data []byte, resp *http.Response) error {
-	var result FreckleError
+	var result NokoError
 	err := json.Unmarshal(data, &result)
 	if err == nil {
 		return result
@@ -98,7 +98,7 @@ func inputs(fns []InputSetter) Inputs {
 }
 
 // Get the full API URL for a URL path and parameters
-func (f Freckle) api(path string, ps Parameters) string {
+func (f Noko) api(path string, ps Parameters) string {
 	u := fmt.Sprintf("%s%s", f.base, path)
 	if ps != nil && len(ps) > 0 {
 		var v url.Values = make(url.Values)
@@ -121,7 +121,7 @@ func body(resp *http.Response) ([]byte, error) {
 }
 
 // Simple internal logging method
-func (f Freckle) log(msg string, data ...interface{}) {
+func (f Noko) log(msg string, data ...interface{}) {
 	if f.debug {
 		log.Printf("DEBUG: %s", fmt.Sprintf(msg, data...))
 	}

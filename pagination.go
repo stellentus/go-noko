@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package freckle
+package noko
 
 import (
 	"net/http"
@@ -136,8 +136,8 @@ func (p ProjectsPage) has(id string) bool {
 
 // fetch another entries page relative to the current one
 func (p EntriesPage) fetch(id string) (EntriesPage, error) {
-	f := p.freckle
-	result := EntriesPage{freckle: f}
+	f := p.noko
+	result := EntriesPage{noko: f}
 
 	req, err := http.NewRequest("GET", p.links[id], nil)
 	if err != nil {
@@ -149,7 +149,7 @@ func (p EntriesPage) fetch(id string) (EntriesPage, error) {
 
 // fetch another entries page relative to the current one
 func (p ProjectsPage) fetch(id string) (ProjectsPage, error) {
-	f := p.freckle
+	f := p.noko
 	result := emptyProjectsPage(f)
 
 	req, err := http.NewRequest("GET", p.links[id], nil)

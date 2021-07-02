@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package freckle
+package noko
 
 import (
 	"fmt"
@@ -21,7 +21,7 @@ func TestListEntries(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	f := letsTestFreckle(ts)
+	f := newNoko(ts)
 
 	page, err := f.EntriesAPI().ListEntries()
 	assert.Nil(t, err, "Error should be nil")
@@ -50,7 +50,7 @@ func TestListEntriesThroughChannel(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	f := letsTestFreckle(ts)
+	f := newNoko(ts)
 
 	items := 0
 	ep, err := f.EntriesAPI().ListEntries()
@@ -66,7 +66,7 @@ func TestGetEntry(t *testing.T) {
 	ts := httptest.NewServer(authenticated(t, "GET", "/entries/1", response(single_entry)))
 	defer ts.Close()
 
-	f := letsTestFreckle(ts)
+	f := newNoko(ts)
 
 	_, err := f.EntriesAPI().GetEntry(1)
 	assert.Nil(t, err, "Error should be nil")
@@ -76,7 +76,7 @@ func TestCreateEntry(t *testing.T) {
 	ts := httptest.NewServer(authenticated(t, "POST", "/entries", response(single_entry)))
 	defer ts.Close()
 
-	f := letsTestFreckle(ts)
+	f := newNoko(ts)
 
 	_, err := f.EntriesAPI().CreateEntry("2014-12-18", 60, func(i Inputs) {
 		i["description"] = "Very hard #support question"
@@ -88,7 +88,7 @@ func TestEditEntry(t *testing.T) {
 	ts := httptest.NewServer(authenticated(t, "PUT", "/entries/1", response(single_entry)))
 	defer ts.Close()
 
-	f := letsTestFreckle(ts)
+	f := newNoko(ts)
 
 	_, err := f.EntriesAPI().EditEntry(1, func(i Inputs) {
 		i["description"] = "Not so hard #support question"
@@ -97,20 +97,20 @@ func TestEditEntry(t *testing.T) {
 }
 
 func TestMarkAsInvoiced(t *testing.T) {
-	ts := httptest.NewServer(authenticated(t, "PUT", "/entries/1/invoiced_outside_of_freckle", noContent()))
+	ts := httptest.NewServer(authenticated(t, "PUT", "/entries/1/invoiced_outside_of_noko", noContent()))
 	defer ts.Close()
 
-	f := letsTestFreckle(ts)
+	f := newNoko(ts)
 
 	err := f.EntriesAPI().MarkAsInvoiced("2014-12-18", 1)
 	assert.Nil(t, err, "Error should be nil")
 }
 
 func TestMarkMultipleAsInvoiced(t *testing.T) {
-	ts := httptest.NewServer(authenticated(t, "PUT", "/entries/invoiced_outside_of_freckle", noContent()))
+	ts := httptest.NewServer(authenticated(t, "PUT", "/entries/invoiced_outside_of_noko", noContent()))
 	defer ts.Close()
 
-	f := letsTestFreckle(ts)
+	f := newNoko(ts)
 
 	err := f.EntriesAPI().MarkMultipleAsInvoiced("2014-12-18", 1, 2, 3)
 	assert.Nil(t, err, "Error should be nil")
@@ -120,7 +120,7 @@ func TestDeleteEntry(t *testing.T) {
 	ts := httptest.NewServer(authenticated(t, "DELETE", "/entries/1", response(array_of_projects)))
 	defer ts.Close()
 
-	f := letsTestFreckle(ts)
+	f := newNoko(ts)
 
 	err := f.EntriesAPI().DeleteEntry(1)
 	assert.Nil(t, err, "Error should be nil")
@@ -135,12 +135,12 @@ const array_of_entries = `[
       "email": "john.test@test.com",
       "first_name": "John",
       "last_name": "Test",
-      "profile_image_url": "https://api.letsfreckle.com/images/avatars/0000/0001/avatar.jpg",
-      "url": "https://api.letsfreckle.com/v2/users/5538"
+      "profile_image_url": "https://api.nokotime.com/images/avatars/0000/0001/avatar.jpg",
+      "url": "https://api.nokotime.com/v2/users/5538"
     },
     "billable": true,
     "minutes": 60,
-    "description": "freckle",
+    "description": "noko",
     "project": {
       "id": 37396,
       "name": "Gear GmbH",
@@ -148,14 +148,14 @@ const array_of_entries = `[
       "enabled": true,
       "billable": true,
       "color": "#ff9898",
-      "url": "https://api.letsfreckle.com/v2/projects/37396"
+      "url": "https://api.nokotime.com/v2/projects/37396"
     },
     "tags": [
       {
         "id": 249397,
-        "name": "freckle",
+        "name": "noko",
         "billable": true,
-        "url": "https://api.letsfreckle.com/v2/tags/249397"
+        "url": "https://api.nokotime.com/v2/tags/249397"
       }
     ],
     "source_url": "http://someapp.com/special/url/",
@@ -165,13 +165,13 @@ const array_of_entries = `[
       "number": "AA001",
       "state": "unpaid",
       "total": 189.33,
-      "url": "https://api.letsfreckle.com/v2/invoices/12345678"
+      "url": "https://api.nokotime.com/v2/invoices/12345678"
     },
     "import": {
       "id": 8910,
-      "url": "https://api.letsfreckle.com/v2/imports/8910"
+      "url": "https://api.nokotime.com/v2/imports/8910"
     },
-    "url": "https://api.letsfreckle.com/v2/entries/1711626",
+    "url": "https://api.nokotime.com/v2/entries/1711626",
     "created_at": "2012-01-09T08:33:29Z",
     "updated_at": "2012-01-09T08:33:29Z"
   }
@@ -185,12 +185,12 @@ const single_entry = `{
     "email": "john.test@test.com",
     "first_name": "John",
     "last_name": "Test",
-    "profile_image_url": "https://api.letsfreckle.com/images/avatars/0000/0001/avatar.jpg",
-    "url": "https://api.letsfreckle.com/v2/users/5538"
+    "profile_image_url": "https://api.nokotime.com/images/avatars/0000/0001/avatar.jpg",
+    "url": "https://api.nokotime.com/v2/users/5538"
   },
   "billable": true,
   "minutes": 60,
-  "description": "freckle",
+  "description": "noko",
   "project": {
     "id": 37396,
     "name": "Gear GmbH",
@@ -198,14 +198,14 @@ const single_entry = `{
     "enabled": true,
     "billable": true,
     "color": "#ff9898",
-    "url": "https://api.letsfreckle.com/v2/projects/37396"
+    "url": "https://api.nokotime.com/v2/projects/37396"
   },
   "tags": [
     {
       "id": 249397,
-      "name": "freckle",
+      "name": "noko",
       "billable": true,
-      "url": "https://api.letsfreckle.com/v2/tags/249397"
+      "url": "https://api.nokotime.com/v2/tags/249397"
     }
   ],
   "source_url": "http://someapp.com/special/url/",
@@ -215,13 +215,13 @@ const single_entry = `{
     "number": "AA001",
     "state": "unpaid",
     "total": 189.33,
-    "url": "https://api.letsfreckle.com/v2/invoices/12345678"
+    "url": "https://api.nokotime.com/v2/invoices/12345678"
   },
   "import": {
     "id": 8910,
-    "url": "https://api.letsfreckle.com/v2/imports/8910"
+    "url": "https://api.nokotime.com/v2/imports/8910"
   },
-  "url": "https://api.letsfreckle.com/v2/entries/1711626",
+  "url": "https://api.nokotime.com/v2/entries/1711626",
   "created_at": "2012-01-09T08:33:29Z",
   "updated_at": "2012-01-09T08:33:29Z"
 }`

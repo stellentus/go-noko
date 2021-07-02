@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package freckle
+package noko
 
 import (
 	"fmt"
@@ -21,7 +21,7 @@ func TestListProjects(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	f := letsTestFreckle(ts)
+	f := newTestNoko(ts)
 
 	page, err := f.ProjectsAPI().ListProjects()
 	assert.Nil(t, err, "Error should be nil")
@@ -50,7 +50,7 @@ func TestListProjectsThroughChannel(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	f := letsTestFreckle(ts)
+	f := newTestNoko(ts)
 
 	pp, err := f.ProjectsAPI().ListProjects()
 	assert.Nil(t, err, "Error should be nil")
@@ -72,7 +72,7 @@ func TestListProjectsWithParameters(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	f := letsTestFreckle(ts)
+	f := newTestNoko(ts)
 
 	page, err := f.ProjectsAPI().ListProjects(func(p Parameters) {
 		p["billable"] = "true"
@@ -89,16 +89,16 @@ func TestListProjectsWithInvalidParameters(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	f := letsTestFreckle(ts)
+	f := newTestNoko(ts)
 
 	_, err := f.ProjectsAPI().ListProjects(func(p Parameters) {
 		p["billable"] = "beer"
 	})
 	assert.NotNil(t, err, "Error should not be nil")
-	if fe, ok := err.(FreckleError); ok {
+	if fe, ok := err.(NokoError); ok {
 		assert.Equal(t, fe.Message, "Validation Failed")
 	} else {
-		t.Errorf("Expected a FreckleError but got %s", err)
+		t.Errorf("Expected a NokoError but got %s", err)
 	}
 }
 
@@ -106,7 +106,7 @@ func TestGetProject(t *testing.T) {
 	ts := httptest.NewServer(authenticated(t, "GET", "/projects/37396", response(single_project)))
 	defer ts.Close()
 
-	f := letsTestFreckle(ts)
+	f := newTestNoko(ts)
 
 	_, err := f.ProjectsAPI().GetProject(37396)
 	assert.Nil(t, err, "Error should be nil")
@@ -116,7 +116,7 @@ func TestCreateProject(t *testing.T) {
 	ts := httptest.NewServer(authenticated(t, "POST", "/projects", response(single_project)))
 	defer ts.Close()
 
-	f := letsTestFreckle(ts)
+	f := newTestNoko(ts)
 
 	_, err := f.ProjectsAPI().CreateProject("Gear GmbH")
 	assert.Nil(t, err, "Error should be nil")
@@ -126,7 +126,7 @@ func TestGetEntries(t *testing.T) {
 	ts := httptest.NewServer(authenticated(t, "GET", "/projects/37396/entries", response(entries_for_project)))
 	defer ts.Close()
 
-	f := letsTestFreckle(ts)
+	f := newTestNoko(ts)
 
 	page, err := f.ProjectsAPI().GetEntries(37396)
 	assert.Nil(t, err, "Error should be nil")
@@ -137,7 +137,7 @@ func TestGetInvoices(t *testing.T) {
 	ts := httptest.NewServer(authenticated(t, "GET", "/projects/37396/invoices", response(invoices_for_project)))
 	defer ts.Close()
 
-	f := letsTestFreckle(ts)
+	f := newTestNoko(ts)
 
 	invoices, err := f.ProjectsAPI().GetInvoices(37396)
 	assert.Nil(t, err, "Error should be nil")
@@ -148,7 +148,7 @@ func TestGetParticipants(t *testing.T) {
 	ts := httptest.NewServer(authenticated(t, "GET", "/projects/37396/participants", response(participants_for_project)))
 	defer ts.Close()
 
-	f := letsTestFreckle(ts)
+	f := newTestNoko(ts)
 
 	participants, err := f.ProjectsAPI().GetParticipants(37396)
 	assert.Nil(t, err, "Error should be nil")
@@ -159,7 +159,7 @@ func TestEditProject(t *testing.T) {
 	ts := httptest.NewServer(authenticated(t, "PUT", "/projects/37396", response(single_project)))
 	defer ts.Close()
 
-	f := letsTestFreckle(ts)
+	f := newTestNoko(ts)
 
 	_, err := f.ProjectsAPI().EditProject(37396, func(i Inputs) {
 		i["name"] = "New Name"
@@ -171,7 +171,7 @@ func TestMergeProject(t *testing.T) {
 	ts := httptest.NewServer(authenticated(t, "PUT", "/projects/1234/merge", noContent()))
 	defer ts.Close()
 
-	f := letsTestFreckle(ts)
+	f := newTestNoko(ts)
 
 	err := f.ProjectsAPI().MergeProject(1234, 4567)
 	assert.Nil(t, err, "Error should be nil")
@@ -181,7 +181,7 @@ func TestDeleteProject(t *testing.T) {
 	ts := httptest.NewServer(authenticated(t, "DELETE", "/projects/1234", noContent()))
 	defer ts.Close()
 
-	f := letsTestFreckle(ts)
+	f := newTestNoko(ts)
 
 	err := f.ProjectsAPI().DeleteProject(1234)
 	assert.Nil(t, err, "Error should be nil")
@@ -191,7 +191,7 @@ func TestArchiveProject(t *testing.T) {
 	ts := httptest.NewServer(authenticated(t, "PUT", "/projects/1234/archive", noContent()))
 	defer ts.Close()
 
-	f := letsTestFreckle(ts)
+	f := newTestNoko(ts)
 
 	err := f.ProjectsAPI().ArchiveProject(1234)
 	assert.Nil(t, err, "Error should be nil")
@@ -201,7 +201,7 @@ func TestUnarchiveProject(t *testing.T) {
 	ts := httptest.NewServer(authenticated(t, "PUT", "/projects/1234/unarchive", noContent()))
 	defer ts.Close()
 
-	f := letsTestFreckle(ts)
+	f := newTestNoko(ts)
 
 	err := f.ProjectsAPI().UnarchiveProject(1234)
 	assert.Nil(t, err, "Error should be nil")
@@ -211,7 +211,7 @@ func TestArchiveMultipleProjects(t *testing.T) {
 	ts := httptest.NewServer(authenticated(t, "PUT", "/projects/archive", noContent()))
 	defer ts.Close()
 
-	f := letsTestFreckle(ts)
+	f := newTestNoko(ts)
 
 	err := f.ProjectsAPI().ArchiveMultipleProjects(1234, 4567)
 	assert.Nil(t, err, "Error should be nil")
@@ -221,7 +221,7 @@ func TestUnarchiveMultipleProjects(t *testing.T) {
 	ts := httptest.NewServer(authenticated(t, "PUT", "/projects/unarchive", noContent()))
 	defer ts.Close()
 
-	f := letsTestFreckle(ts)
+	f := newTestNoko(ts)
 
 	err := f.ProjectsAPI().UnarchiveMultipleProjects(1234, 4567)
 	assert.Nil(t, err, "Error should be nil")
@@ -231,7 +231,7 @@ func TestDeleteMultipleProjects(t *testing.T) {
 	ts := httptest.NewServer(authenticated(t, "PUT", "/projects/delete", noContent()))
 	defer ts.Close()
 
-	f := letsTestFreckle(ts)
+	f := newTestNoko(ts)
 
 	err := f.ProjectsAPI().DeleteMultipleProjects(1234, 4567)
 	assert.Nil(t, err, "Error should be nil")
@@ -245,11 +245,11 @@ const array_of_projects = `[
     "enabled": true,
     "billable": true,
     "color": "#ff9898",
-    "url": "https://api.letsfreckle.com/v2/projects/34580",
+    "url": "https://api.nokotime.com/v2/projects/34580",
     "group": {
       "id": 3768,
       "name": "Sprockets, Inc.",
-      "url": "https://api.letsfreckle.com/v2/project_groups/3768"
+      "url": "https://api.nokotime.com/v2/project_groups/3768"
     },
     "minutes": 180,
     "billable_minutes": 120,
@@ -259,7 +259,7 @@ const array_of_projects = `[
     "budget_minutes": 750,
     "import": {
       "id": 8910,
-      "url": "https://api.letsfreckle.com/v2/imports/8910"
+      "url": "https://api.nokotime.com/v2/imports/8910"
     },
     "invoices": [
       {
@@ -268,7 +268,7 @@ const array_of_projects = `[
         "invoice_date": "2013-07-09",
         "state": "unpaid",
         "total_amount": 189.33,
-        "url": "https://api.letsfreckle.com/v2/invoices/12345678"
+        "url": "https://api.nokotime.com/v2/invoices/12345678"
       }
     ],
     "participants": [
@@ -277,14 +277,14 @@ const array_of_projects = `[
         "email": "john.test@test.com",
         "first_name": "John",
         "last_name": "Test",
-        "profile_image_url": "https://api.letsfreckle.com/images/avatars/0000/0001/avatar.jpg",
-        "url": "https://api.letsfreckle.com/v2/users/5538"
+        "profile_image_url": "https://api.nokotime.com/images/avatars/0000/0001/avatar.jpg",
+        "url": "https://api.nokotime.com/v2/users/5538"
       }
     ],
     "entries": 0,
-    "entries_url": "https://api.letsfreckle.com/v2/projects/34580/entries",
+    "entries_url": "https://api.nokotime.com/v2/projects/34580/entries",
     "expenses": 0,
-    "expenses_url": "https://api.letsfreckle.com/v2/projects/34580/expenses",
+    "expenses_url": "https://api.nokotime.com/v2/projects/34580/expenses",
     "created_at": "2012-01-09T08:33:29Z",
     "updated_at": "2012-01-09T08:33:29Z"
   }
@@ -297,11 +297,11 @@ const single_project = `{
   "enabled": true,
   "billable": true,
   "color": "#ff9898",
-  "url": "https://api.letsfreckle.com/v2/projects/34580",
+  "url": "https://api.nokotime.com/v2/projects/34580",
   "group": {
     "id": 3768,
     "name": "Sprockets, Inc.",
-    "url": "https://api.letsfreckle.com/v2/project_groups/3768"
+    "url": "https://api.nokotime.com/v2/project_groups/3768"
   },
   "minutes": 180,
   "billable_minutes": 120,
@@ -311,7 +311,7 @@ const single_project = `{
   "budget_minutes": 750,
   "import": {
     "id": 8910,
-    "url": "https://api.letsfreckle.com/v2/imports/8910"
+    "url": "https://api.nokotime.com/v2/imports/8910"
   },
   "invoices": [
     {
@@ -320,7 +320,7 @@ const single_project = `{
       "invoice_date": "2013-07-09",
       "state": "unpaid",
       "total_amount": 189.33,
-      "url": "https://api.letsfreckle.com/v2/invoices/12345678"
+      "url": "https://api.nokotime.com/v2/invoices/12345678"
     }
   ],
   "participants": [
@@ -329,14 +329,14 @@ const single_project = `{
       "email": "john.test@test.com",
       "first_name": "John",
       "last_name": "Test",
-      "profile_image_url": "https://api.letsfreckle.com/images/avatars/0000/0001/avatar.jpg",
-      "url": "https://api.letsfreckle.com/v2/users/5538"
+      "profile_image_url": "https://api.nokotime.com/images/avatars/0000/0001/avatar.jpg",
+      "url": "https://api.nokotime.com/v2/users/5538"
     }
   ],
   "entries": 0,
-  "entries_url": "https://api.letsfreckle.com/v2/projects/34580/entries",
+  "entries_url": "https://api.nokotime.com/v2/projects/34580/entries",
   "expenses": 0,
-  "expenses_url": "https://api.letsfreckle.com/v2/projects/34580/expenses",
+  "expenses_url": "https://api.nokotime.com/v2/projects/34580/expenses",
   "created_at": "2012-01-09T08:33:29Z",
   "updated_at": "2012-01-09T08:33:29Z"
 }`
@@ -350,12 +350,12 @@ const entries_for_project = `[
       "email": "john.test@test.com",
       "first_name": "John",
       "last_name": "Test",
-      "profile_image_url": "https://api.letsfreckle.com/images/avatars/0000/0001/avatar.jpg",
-      "url": "https://api.letsfreckle.com/v2/users/5538"
+      "profile_image_url": "https://api.nokotime.com/images/avatars/0000/0001/avatar.jpg",
+      "url": "https://api.nokotime.com/v2/users/5538"
     },
     "billable": true,
     "minutes": 60,
-    "description": "freckle",
+    "description": "noko",
     "project": {
       "id": 37396,
       "name": "Gear GmbH",
@@ -363,14 +363,14 @@ const entries_for_project = `[
       "enabled": true,
       "billable": true,
       "color": "#ff9898",
-      "url": "https://api.letsfreckle.com/v2/projects/37396"
+      "url": "https://api.nokotime.com/v2/projects/37396"
     },
     "tags": [
       {
         "id": 249397,
-        "name": "freckle",
+        "name": "noko",
         "billable": true,
-        "url": "https://api.letsfreckle.com/v2/tags/249397"
+        "url": "https://api.nokotime.com/v2/tags/249397"
       }
     ],
     "source_url": "http://someapp.com/special/url/",
@@ -381,13 +381,13 @@ const entries_for_project = `[
       "invoice_date": "2013-07-09",
       "state": "unpaid",
       "total_amount": 189.33,
-      "url": "https://api.letsfreckle.com/v2/invoices/12345678"
+      "url": "https://api.nokotime.com/v2/invoices/12345678"
     },
     "import": {
       "id": 8910,
-      "url": "https://api.letsfreckle.com/v2/imports/8910"
+      "url": "https://api.nokotime.com/v2/imports/8910"
     },
-    "url": "https://api.letsfreckle.com/v2/entries/1711626",
+    "url": "https://api.nokotime.com/v2/entries/1711626",
     "created_at": "2012-01-09T08:33:29Z",
     "updated_at": "2012-01-09T08:33:29Z"
   }
@@ -399,7 +399,7 @@ const invoices_for_project = `[
     "state": "awaiting_payment",
     "number": "AB 0001",
     "invoice_date": "2013-07-09",
-    "name": "Knockd, Freckle Support",
+    "name": "Knockd, Noko Support",
     "company_name": "John Test",
     "company_details": "1 Main Street\\r\\nMainsville, MA 11122",
     "recipient_details": "",
@@ -446,8 +446,8 @@ const invoices_for_project = `[
             "email": "john.test@test.com",
             "first_name": "John",
             "last_name": "Test",
-            "profile_image_url": "https://api.letsfreckle.com/images/avatars/0000/0001/avatar.jpg",
-            "url": "https://api.letsfreckle.com/v2/users/5538"
+            "profile_image_url": "https://api.nokotime.com/images/avatars/0000/0001/avatar.jpg",
+            "url": "https://api.nokotime.com/v2/users/5538"
           },
           "rate": 30.5,
           "hourly_rate_with_currency": "$30.50"
@@ -466,7 +466,7 @@ const invoices_for_project = `[
     "amount_tax_total": 0,
     "amount_total": 1,
     "amount_total_with_currency": "$1.00",
-    "share_url": "https://apitest.letsfreckle.com/i/bqrnbojlbxqswtq9xla9uc40z",
+    "share_url": "https://apitest.nokotime.com/i/bqrnbojlbxqswtq9xla9uc40z",
     "payment": null,
     "payment_transactions": [
       {
@@ -486,13 +486,13 @@ const invoices_for_project = `[
         "enabled": true,
         "billable": true,
         "color": "#ff9898",
-        "url": "https://api.letsfreckle.com/v2/projects/37396"
+        "url": "https://api.nokotime.com/v2/projects/37396"
       }
     ],
     "entries": 0,
-    "entries_url": "https://api.letsfreckle.com/v2/invoices/26642/entries",
+    "entries_url": "https://api.nokotime.com/v2/invoices/26642/entries",
     "expenses": 0,
-    "expenses_url": "https://api.letsfreckle.com/v2/invoices/26642/expenses",
+    "expenses_url": "https://api.nokotime.com/v2/invoices/26642/expenses",
     "created_at": "2013-07-09T23:04:05Z",
     "updated_at": "2013-07-09T23:04:06Z",
     "from_address": null,
@@ -510,20 +510,20 @@ const participants_for_project = `[
     "email": "john.test@test.com",
     "first_name": "John",
     "last_name": "Test",
-    "profile_image_url": "https://api.letsfreckle.com/images/avatars/0000/0001/avatar.jpg",
-    "url": "https://api.letsfreckle.com/v2/users/5538",
+    "profile_image_url": "https://api.nokotime.com/images/avatars/0000/0001/avatar.jpg",
+    "url": "https://api.nokotime.com/v2/users/5538",
     "state": "active",
     "role": "member",
     "participating_projects": 0,
-    "participating_projects_url": "https://api.letsfreckle.com/v2/users/5538/participating_projects",
+    "participating_projects_url": "https://api.nokotime.com/v2/users/5538/participating_projects",
     "accessible_projects": 0,
-    "accessible_projects_url": "https://api.letsfreckle.com/v2/users/5538/accessible_projects",
+    "accessible_projects_url": "https://api.nokotime.com/v2/users/5538/accessible_projects",
     "entries": 0,
-    "entries_url": "https://api.letsfreckle.com/v2/users/5538/entries",
+    "entries_url": "https://api.nokotime.com/v2/users/5538/entries",
     "expenses": 0,
-    "expenses_url": "https://api.letsfreckle.com/v2/users/5538/expenses",
-    "add_project_access": "https://api.letsfreckle.com/v2/users/5538/project_access/add",
-    "remove_project_access": "https://api.letsfreckle.com/v2/users/5538/project_access/remove",
+    "expenses_url": "https://api.nokotime.com/v2/users/5538/expenses",
+    "add_project_access": "https://api.nokotime.com/v2/users/5538/project_access/add",
+    "remove_project_access": "https://api.nokotime.com/v2/users/5538/project_access/remove",
     "created_at": "2010-06-09T20:44:57Z",
     "updated_at": "2010-06-09T20:44:57Z"
   }

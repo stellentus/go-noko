@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package freckle
+package noko
 
 // Shared type definitions for API input/output
 
@@ -26,7 +26,7 @@ type Entry struct {
 
 type EntriesPage struct {
 	links   map[string]string
-	freckle *Freckle
+	noko    *Noko
 	Entries []Entry
 }
 
@@ -44,13 +44,13 @@ type Invoice struct {
 	Url         string  `json:"url,omitempty"`
 }
 
-// Error type returned by Freckle API
-type FreckleError struct {
-	Message string               `json:"message,omitempty"`
-	Errors  []FreckleErrorDetail `json:"errors,omitempty"`
+// Error type returned by Noko API
+type NokoError struct {
+	Message string            `json:"message,omitempty"`
+	Errors  []NokoErrorDetail `json:"errors,omitempty"`
 }
 
-type FreckleErrorDetail struct {
+type NokoErrorDetail struct {
 	Code     string `json:"code,omitempty"`
 	Field    string `json:"field,omitempty"`
 	Resource string `json:"resource,omitempty"`
@@ -93,7 +93,7 @@ type Project struct {
 
 type ProjectsPage struct {
 	links    map[string]string
-	freckle  *Freckle
+	noko     *Noko
 	Projects []Project
 }
 

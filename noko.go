@@ -2,17 +2,17 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// This package implements a Go client for the Freckle V2 API.
+// This package implements a Go client for the Noko V2 API.
 //
 // More information about the API itself can be found at
-// http://developer.letsfreckle.com/v2/
-package freckle
+// http://developer.nokotime.com/v2/
+package noko
 
 import (
 	"net/http"
 )
 
-type Freckle struct {
+type Noko struct {
 	subdomain, key string
 	debug          bool
 	client         *http.Client
@@ -20,42 +20,42 @@ type Freckle struct {
 }
 
 // Start using the API here -
-func LetsFreckle(subdomain, key string) Freckle {
-	return Freckle{subdomain, key, false, &http.Client{}, "https://api.letsfreckle.com/v2"}
+func New(subdomain, key string) Noko {
+	return Noko{subdomain, key, false, &http.Client{}, "https://api.nokotime.com/v2"}
 }
 
 // Enable/disable debug mode. When debug mode is enabled,
 // you will get additional logging showing the HTTP requests
 // and responses
-func (f *Freckle) Debug(d bool) {
+func (f *Noko) Debug(d bool) {
 	f.debug = d
 }
 
 // Configure a custom HTTP client (e.g. to configure a proxy server)
-func (f *Freckle) Client(client *http.Client) {
+func (f *Noko) Client(client *http.Client) {
 	f.client = client
 }
 
 /*
-Access the LetsFreckle v2 Entries API
+Access the Noko v2 Entries API
 
-more info at http://developer.letsfreckle.com/v2/entries
+more info at http://developer.nokotime.com/v2/entries
 */
-func (f Freckle) EntriesAPI() EntriesAPI {
+func (f Noko) EntriesAPI() EntriesAPI {
 	return EntriesAPI{&f}
 }
 
 /*
-Access the LetsFreckle v2 Projects API
+Access the Noko v2 Projects API
 
-more info at http://developer.letsfreckle.com/v2/projects
+more info at http://developer.nokotime.com/v2/projects
 */
-func (f Freckle) ProjectsAPI() ProjectsAPI {
+func (f Noko) ProjectsAPI() ProjectsAPI {
 	return ProjectsAPI{&f}
 }
 
-// Get the error message for a Freckle API error
-func (e FreckleError) Error() string {
+// Get the error message for a Noko API error
+func (e NokoError) Error() string {
 	return e.Message
 }
 
